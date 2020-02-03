@@ -9,11 +9,7 @@ import zbh.study.interceptors.AccessInterceptor;
 
 import java.util.List;
 
-/**
- * @author: wuhui
- * @time: 2019/9/7 23:00
- * @desc:
- */
+
 @Configuration
 public class MyWebConfig implements WebMvcConfigurer {
     @Autowired

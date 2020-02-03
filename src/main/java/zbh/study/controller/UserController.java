@@ -13,11 +13,7 @@ import zbh.study.result.CodeMsg;
 import zbh.study.result.Result;
 import zbh.study.service.UserService;
 
-/**
- * @author: wuhui
- * @time: 2019/9/7 17:16
- * @desc:
- */
+
 @Controller
 public class UserController {
     @Autowired

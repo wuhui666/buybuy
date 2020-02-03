@@ -4,11 +4,7 @@ import lombok.Data;
 
 import java.util.Date;
 
-/**
- * @author: wuhui
- * @time: 2019/9/8 16:30
- * @desc:
- */
+
 @Data
 public class OrderDetail {
     private Long id;

@@ -3,11 +3,7 @@ package zbh.study.dao;
 import org.apache.ibatis.annotations.*;
 import zbh.study.domain.BuyOrder;
 
-/**
- * @author: wuhui
- * @time: 2019/9/8 22:54
- * @desc:
- */
+
 @Mapper
 public interface BuyOrderDAO {
     @Select("select count(*) from buy_order where user_id=#{uid} and product_id=#{pid}")

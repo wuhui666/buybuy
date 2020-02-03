@@ -2,11 +2,7 @@ package zbh.study.domain;
 
 import lombok.Data;
 
-/**
- * @author: wuhui
- * @time: 2019/9/8 16:28
- * @desc:
- */
+
 @Data
 public class Product {
     private Long id;

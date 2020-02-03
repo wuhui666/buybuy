@@ -5,11 +5,7 @@ import zbh.study.domain.Product;
 
 import java.util.Date;
 
-/**
- * @author: wuhui
- * @time: 2019/9/8 16:49
- * @desc:
- */
+
 @Data
 public class ProductDTO extends Product {
     private Integer buyStock;

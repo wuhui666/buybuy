@@ -17,11 +17,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 
-/** redis 缓存
- * @author: wuhui
- * @time: 2019/9/7 10:35
- * @desc:
- */
+
 @Configuration
 @ConfigurationProperties(prefix = "spring.cache.redis")
 public class RedisCacheConfig {

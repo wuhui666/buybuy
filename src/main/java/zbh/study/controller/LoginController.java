@@ -12,11 +12,7 @@ import zbh.study.vo.LoginVO;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-/**
- * @author: wuhui
- * @time: 2019/9/6 22:12
- * @desc:
- */
+
 @Slf4j
 @Controller
 @RequestMapping("/login")

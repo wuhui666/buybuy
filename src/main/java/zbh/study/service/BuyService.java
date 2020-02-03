@@ -21,11 +21,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author: wuhui
- * @time: 2019/9/8 23:07
- * @desc:
- */
+
 @Service
 @Slf4j
 public class BuyService {

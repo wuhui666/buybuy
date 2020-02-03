@@ -25,11 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author: wuhui
- * @time: 2019/9/7 21:33
- * @desc:
- */
+
 @Controller
 @RequestMapping("/products")
 public class ProductController {

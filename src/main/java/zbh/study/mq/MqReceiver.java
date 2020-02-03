@@ -12,11 +12,7 @@ import zbh.study.service.ProductService;
 import zbh.study.service.BuyOrderService;
 import zbh.study.service.BuyService;
 
-/**
- * @author: wuhui
- * @time: 2019/9/10 22:02
- * @desc:
- */
+
 @Service
 @Slf4j
 public class MqReceiver {

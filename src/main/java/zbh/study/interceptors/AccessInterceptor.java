@@ -21,11 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author: wuhui
- * @time: 2019/9/16 10:13
- * @desc:
- */
+
 @Service
 public class AccessInterceptor extends HandlerInterceptorAdapter {
     @Autowired

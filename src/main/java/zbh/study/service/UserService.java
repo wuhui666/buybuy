@@ -18,11 +18,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author: wuhui
- * @time: 2019/9/6 23:12
- * @desc:
- */
+
 @Service
 public class UserService {
     public static final String COOKIE_NAME_TOKEN="_token";

@@ -9,11 +9,7 @@ import zbh.study.dto.ProductDTO;
 
 import java.util.List;
 
-/**
- * @author: wuhui
- * @time: 2019/9/8 17:00
- * @desc:
- */
+
 @Service
 public class ProductService {
     @Autowired

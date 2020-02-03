@@ -5,11 +5,7 @@ import	java.util.Date;
 
 import java.util.Date;
 
-/**
- * @author: wuhui
- * @time: 2019/9/8 16:29
- * @desc:
- */
+
 @Data
 public class BuyProduct {
     private Long id;

@@ -10,11 +10,7 @@ import zbh.study.domain.BuyProduct;
 import zbh.study.domain.Product;
 import zbh.study.dto.ProductDTO;
 
-/**
- * @author: wuhui
- * @time: 2019/9/8 16:47
- * @desc:
- */
+
 @Mapper
 public interface ProductDAO {
     @Select("select p.*,sp.buy_price,sp.buy_stock,sp.start_date,sp.end_date from product p left join buy_product sp on p.id=sp.product_id")

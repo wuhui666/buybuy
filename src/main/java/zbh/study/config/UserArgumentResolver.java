@@ -9,11 +9,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import zbh.study.domain.User;
 import zbh.study.threadLocal.UserLocal;
 
-/**
- * @author: wuhui
- * @time: 2019/9/7 23:02
- * @desc:
- */
+
 @Component
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 

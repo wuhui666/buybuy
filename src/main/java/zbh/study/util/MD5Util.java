@@ -2,11 +2,7 @@ package zbh.study.util;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-/**
- * @author: wuhui
- * @time: 2019/9/7 10:55
- * @desc:
- */
+
 public class MD5Util {
     public static String md5(String src) {
         return DigestUtils.md5Hex(src);

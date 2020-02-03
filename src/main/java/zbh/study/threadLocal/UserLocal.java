@@ -2,11 +2,6 @@ package zbh.study.threadLocal;
 
 import zbh.study.domain.User;
 
-/**
- * @author: wuhui
- * @time: 2019/9/16 10:55
- * @desc:
- */
 public class UserLocal {
     private static ThreadLocal<User> userThreadLocal=new ThreadLocal<>();
 

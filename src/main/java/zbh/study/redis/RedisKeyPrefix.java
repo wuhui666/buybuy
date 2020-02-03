@@ -1,10 +1,6 @@
 package zbh.study.redis;
 
-/**
- * @author: wuhui
- * @time: 2019/9/7 22:26
- * @desc:
- */
+
 public class RedisKeyPrefix {
     // 统一单位 秒
     public static final Long EXPIRE_TIME_MINUTE=60L;

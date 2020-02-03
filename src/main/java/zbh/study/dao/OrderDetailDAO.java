@@ -3,11 +3,7 @@ package zbh.study.dao;
 import org.apache.ibatis.annotations.*;
 import zbh.study.domain.OrderDetail;
 
-/**
- * @author: wuhui
- * @time: 2019/9/9 8:58
- * @desc:
- */
+
 @Mapper
 public interface OrderDetailDAO {
     @Insert("insert into " +

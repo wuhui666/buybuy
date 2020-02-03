@@ -28,11 +28,7 @@ import java.awt.image.BufferedImage;
 import java.io.OutputStream;
 import java.util.List;
 
-/**
- * @author: wuhui
- * @time: 2019/9/8 22:42
- * @desc:
- */
+
 @Controller
 public class BuyController implements InitializingBean {
 

@@ -16,11 +16,6 @@ import zbh.study.redis.RedisKeyPrefix;
 
 import java.util.Date;
 
-/**
- * @author: wuhui
- * @time: 2019/9/8 22:52
- * @desc:
- */
 @Service
 public class BuyOrderService {
     @Autowired
