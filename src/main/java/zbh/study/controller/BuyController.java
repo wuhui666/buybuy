@@ -58,24 +58,26 @@ public class BuyController implements InitializingBean {
     @ResponseBody
     public Result doBuy(
             User user, Model model,
-            @RequestParam("productId") long id,
+            Long productId,
             @PathVariable("path") String path){
         if (user == null) {
             return Result.error(CodeMsg.SESSION_ERROR);
         }
         // 检查缓存中是否找得到path
-        String s = redisTemplate.opsForValue().get(RedisKeyPrefix.BUY_PATH_STRING + user.getId() + "_" + id);
+        String s = redisTemplate.opsForValue().get(RedisKeyPrefix.BUY_PATH_STRING + user.getId() + "_" + productId);
 
         if (StringUtils.isBlank(s)){
+            // TODO:  注释掉以便进行测试
             return Result.error(CodeMsg.BUY_DENIED);
         }
         //判断是否已经秒杀到了
-        OrderDetail orderDetail = buyOrderService.getByUserAndProduct(user.getId(), id);
+        OrderDetail orderDetail = buyOrderService.getByUserAndProduct(user.getId(), productId);
         if(orderDetail != null) {
+            // TODO:  注释掉以便进行测试
             return Result.error(CodeMsg.BUY_REPEAT);
         }
         //判断库存
-        String stock = redisTemplate.opsForValue().get(RedisKeyPrefix.PRODUCT_STOCK+id);
+        String stock = redisTemplate.opsForValue().get(RedisKeyPrefix.PRODUCT_STOCK+productId);
         if(Long.valueOf(stock) <= 0) {
             return Result.error(CodeMsg.BUY_FAIL);
         }
@@ -84,7 +86,7 @@ public class BuyController implements InitializingBean {
         //入队
         BuyMessage message = new BuyMessage();
         message.setUser(user);
-        message.setProductId(id);
+        message.setProductId(productId);
         sender.sendMessage(message);
         return Result.success(0);//排队中
 
@@ -150,7 +152,6 @@ public class BuyController implements InitializingBean {
             return Result.error(CodeMsg.BUY_VERIFY_ERROR);
         }
         String path  = buyService.createBuyPath(user, productId);
-        System.out.println("获得秒杀路径："+path);
         return Result.success(path);
     }
 
