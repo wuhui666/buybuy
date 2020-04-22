@@ -21,6 +21,8 @@ public class UserController {
     @Autowired
     StringRedisTemplate redisTemplate;
 
+
+
     @RequestMapping("/user/{id}")
     @ResponseBody
     public Result getUser(@PathVariable long id) {

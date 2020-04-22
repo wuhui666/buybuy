@@ -15,7 +15,7 @@ public class MqSender {
 
     public void sendMessage(BuyMessage message) {
         String msg = JSON.toJSONString(message);
-        log.info("send message:"+msg);
+        //log.info("send message:"+msg);
         amqpTemplate.convertAndSend(MqConfig.SECKILL_QUEUE,msg);
     }
 }

@@ -187,6 +187,11 @@ public class BuyService {
     }
 
     public boolean checkVerifyCode(User user, long productId, int verifyCode) {
+        // todo 绕过验证码以便测试
+        if (2>1){
+            return true;
+        }
+
         if(user == null || productId <=0) {
             return false;
         }

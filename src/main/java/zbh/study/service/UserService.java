@@ -5,11 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import zbh.study.dao.UserDAO;
 import zbh.study.domain.User;
 import zbh.study.exception.GlobalException;
 import zbh.study.redis.RedisKeyPrefix;
 import zbh.study.result.CodeMsg;
+import zbh.study.result.Result;
 import zbh.study.util.MD5Util;
 import zbh.study.util.TokenUtil;
 import zbh.study.vo.LoginVO;
@@ -26,6 +29,10 @@ public class UserService {
     UserDAO dao;
     @Autowired
     StringRedisTemplate template;
+
+    public int addUser(User user) {
+        return dao.addUser(user);
+    }
 
     @Cacheable(value = "User",key = "#p0")
     public User findUserById(Long id){
@@ -58,7 +65,6 @@ public class UserService {
         String saltDB = user.getSalt();
         // 二次加密后对比
         String resultPass = MD5Util.formPassToDBPass(formPass, saltDB);
-        System.out.println(resultPass);
         if(!resultPass.equals(dbPass)) {
             throw new GlobalException(CodeMsg.PASSWORD_ERROR);
         }

@@ -149,7 +149,7 @@ function dobuy(path){
 		url:"/"+path+"/buy/",
 		type:"POST",
 		data:{
-            productId:$("#productId").val(),
+            productId:$("#productId").val()
 		},
 		success:function(data){
 		    // 排队
@@ -235,22 +235,22 @@ function countDown(){
 	}else if(remainSeconds < 0){//秒杀进行中
 		$("#buyButton").attr("disabled", false);
 		$("#productTip").html("秒杀进行中,剩余"+formatCountDate(Math.abs(remainSeconds)));
-        if(timeout){
-            clearTimeout(timeout);
-        }
+
         timeout2=setTimeout(function(){
             //js的+号有点坑啊，记得*1
             $("#remainSeconds").val(remainSeconds*1 + 1);
             countDown();
         },1000);
-        $("#verifyCodeImg").attr("src", "/buy/verifyCode?productId="+$("#productId").val());
+        // 定时器等待1s的时候后面的代码会执行的
+        //由于第一次src属性不存在，所以是undefined
+        //第一次才改动src
+        if ($("#verifyCodeImg").attr("src")===undefined) {
+            $("#verifyCodeImg").attr("src", "/buy/verifyCode?productId="+$("#productId").val());
+        }
+
         $("#verifyCodeImg").show();
         $("#verifyCode").show();
 	}else{//秒杀已经结束
-
-        if(timeout2){
-            clearTimeout(timeout2);
-        }
 		$("#buyButton").attr("disabled", true);
 		$("#productTip").html("秒杀已经结束");
         $("#verifyCodeImg").hide();
@@ -258,6 +258,7 @@ function countDown(){
 	}
 }
 function refreshVerifyCode(){
+    //时间戳确保不会使用浏览器缓存图片，每次都是重新调接口
     $("#verifyCodeImg").attr("src", "/buy/verifyCode?productId="+$("#productId").val()+"&timestamp="+new Date().getTime());
 }
 function formatDate(time) {

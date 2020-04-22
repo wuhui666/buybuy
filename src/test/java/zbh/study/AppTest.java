@@ -10,6 +10,7 @@ import zbh.study.domain.OrderDetail;
 import zbh.study.domain.Product;
 import zbh.study.domain.User;
 import zbh.study.dto.ProductDTO;
+import zbh.study.service.UserService;
 
 import java.util.Date;
 
@@ -22,6 +23,8 @@ public class AppTest
 {
     @Autowired
     OrderDetailDAO dao;
+    @Autowired
+    UserService userService;
     /**
      * Rigorous Test :-)
      */
@@ -47,4 +50,21 @@ public class AppTest
         System.out.println(order.toString());
         dao.insert(order);
     }
+    @Test
+    public void addUser(){
+        
+        Long id=new Long(13620229999L);
+        User newUser=new User();
+        newUser.setNickname("hehe");
+        newUser.setPassword("7b8b85447acdf5159b9f663a2c0992d1");
+        newUser.setSalt("wuhui666");
+        newUser.setLoginCount(0);
+        newUser.setRegisterDate(new Date());
+        newUser.setLastLoginDate(new Date());
+        for (int i = 1; i < 2; i++) {
+            newUser.setId(id+i);
+            userService.addUser(newUser);
+    }
+
+}
 }

@@ -67,15 +67,14 @@ public class BuyController implements InitializingBean {
         String s = redisTemplate.opsForValue().get(RedisKeyPrefix.BUY_PATH_STRING + user.getId() + "_" + productId);
 
         if (StringUtils.isBlank(s)){
-            // TODO:  注释掉以便进行测试
             return Result.error(CodeMsg.BUY_DENIED);
         }
         //判断是否已经秒杀到了
         OrderDetail orderDetail = buyOrderService.getByUserAndProduct(user.getId(), productId);
-        if(orderDetail != null) {
-            // TODO:  注释掉以便进行测试
+        // TODO:  注释掉允许重复购买
+        /*if(orderDetail != null) {
             return Result.error(CodeMsg.BUY_REPEAT);
-        }
+        }*/
         //判断库存
         String stock = redisTemplate.opsForValue().get(RedisKeyPrefix.PRODUCT_STOCK+productId);
         if(Long.valueOf(stock) <= 0) {
@@ -114,7 +113,7 @@ public class BuyController implements InitializingBean {
     public Result<Boolean> reset(Model model) {
         List<ProductDTO> products = productService.listProducts();
         for(ProductDTO productDTO : products) {
-            productDTO.setBuyStock(10);
+            productDTO.setBuyStock(100000);
             redisTemplate.opsForValue().set(RedisKeyPrefix.PRODUCT_STOCK+productDTO.getId(), JSON.toJSONString(productDTO));
 
         }
@@ -122,6 +121,7 @@ public class BuyController implements InitializingBean {
         redisTemplate.delete(redisTemplate.keys(RedisKeyPrefix.BUY_ORDER_DETAIL + "*"));
         redisTemplate.delete(redisTemplate.keys(RedisKeyPrefix.PRODUCT_STOCK + "*"));
         redisTemplate.delete(redisTemplate.keys(RedisKeyPrefix.PRODUCT_STOCK + "*"));
+        redisTemplate.delete(redisTemplate.keys(RedisKeyPrefix.USER_TOKEN_PREFIX + "*"));
 
 
         // 重置

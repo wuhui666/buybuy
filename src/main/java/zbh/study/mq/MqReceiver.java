@@ -27,7 +27,7 @@ public class MqReceiver {
     BuyService buyService;
     @RabbitListener(queues=MqConfig.SECKILL_QUEUE)
     public void receive(String message){
-            log.info("receive message:"+message);
+            //log.info("receive message:"+message);
             BuyMessage mm  = JSON.parseObject(message).toJavaObject(BuyMessage.class);
             User user = mm.getUser();
             long productId = mm.getProductId();
@@ -38,9 +38,10 @@ public class MqReceiver {
             }
             //判断是否已经秒杀到了
             OrderDetail orderDetail = buyOrderService.getByUserAndProduct(user.getId(), productId);
-            if(orderDetail != null) {
+            // TODO:  注释掉允许重复购买
+           /* if(orderDetail != null) {
                 return;
-            }
+            }*/
             //减库存 下订单 写入秒杀订单
             buyService.buy(user, dto);
 
