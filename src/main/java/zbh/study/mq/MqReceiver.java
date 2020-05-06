@@ -4,13 +4,16 @@ import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import zbh.study.domain.OrderDetail;
 import zbh.study.domain.User;
+import zbh.study.dto.OrderDetailDTO;
 import zbh.study.dto.ProductDTO;
-import zbh.study.service.ProductService;
+import zbh.study.redis.RedisKeyPrefix;
 import zbh.study.service.BuyOrderService;
 import zbh.study.service.BuyService;
+import zbh.study.service.ProductService;
 
 
 @Service
@@ -24,8 +27,18 @@ public class MqReceiver {
     BuyOrderService buyOrderService;
 
     @Autowired
+    BuyOrderService orderService;
+
+    @Autowired
+    MqSender delaySender;
+
+    @Autowired
     BuyService buyService;
-    @RabbitListener(queues=MqConfig.SECKILL_QUEUE)
+
+    @Autowired
+    StringRedisTemplate redisTemplate;
+
+    @RabbitListener(queues=MqConfig.BUYBUY_NORMAL_QUEUE)
     public void receive(String message){
             //log.info("receive message:"+message);
             BuyMessage mm  = JSON.parseObject(message).toJavaObject(BuyMessage.class);
@@ -43,10 +56,31 @@ public class MqReceiver {
                 return;
             }*/
             //减库存 下订单 写入秒杀订单
-            buyService.buy(user, dto);
+            OrderDetail detail=buyService.buy(user, dto);
+            //订单限制时间支付
+            delaySender.sendOrderToDelay(String.valueOf(detail.getId()));
 
     }
 
+    @RabbitListener(queues=MqConfig.BUYBUY_DEAD_QUEUE)
+    public void receiveDead(String message){
+        long orderId = Long.valueOf(message);
+        OrderDetail detail = buyOrderService.getOrderById(orderId);
+        if(detail==null){
+            return;
+        }
+        //已支付
+        if (detail.getStatus()!=0){
+            return;
+        }
+        //未支付，库存回扣
+        Long productId = detail.getProductId();
+        productService.increaseStockById(productId,1);
+        // 数据库超时订单清除
+        buyOrderService.deleteOrderById(orderId);
+        // Redis清除
+        redisTemplate.delete(RedisKeyPrefix.BUY_ORDER_DETAIL+detail.getUserId()+"_"+detail.getProductId());
+    }
 
 
 }

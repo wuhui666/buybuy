@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- jquery -->
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css" />
+    <script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+    <!-- jquery-validator 校验 -->
+    <script type="text/javascript" src="/jquery-validation/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/jquery-validation/localization/messages_zh.min.js"></script>
+    <!-- layer 弹窗 -->
+    <script type="text/javascript" src="/layer/layer.js"></script>
+    <!-- md5.js -->
+    <script type="text/javascript" src="/js/md5.min.js"></script>
+    <!-- common.js 自定义公用js-->
+    <script type="text/javascript" src="/js/common.js"></script>
+    
+    <style>
+        html{
+            padding-top: 5%;
+        }
+        html,body{
+            height:100%;
+            wid100%;
+        }
+        body{
+            background:url('/img/login.jpg') no-repeat;
+            background-size:100% 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<div class="row" style="margin-top: 0px">
+    <div class="col-md-5 col-md-5" style="margin-left: 36%;margin-right: 32%">
+        <form onsubmit="return no_submit()" id="myform">
+            <table style="border-collapse:separate;border-spacing: 25px;border: solid 2px gainsboro">
+                <tr>
+                    <td colspan="2" style="margin-bottom: 10px;text-align: center;">
+                        <h3 id="tip" style="font-weight: bold;font-family: Arial">欢迎注册！</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label>昵&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</label></td>
+                    <td>
+
+                        <input id="nickname"  name="nickname"  type="text" class="form-control">
+                        <span id="nicknameSpan"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label>手&nbsp;&nbsp;机&nbsp;&nbsp;号:</label></td>
+                    <td>
+                        <input id="userId" name="userId" type="text" class="form-control" >
+                        <span id="userIdSpan"></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><label>密&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;码：</label></td>
+                    <td>
+                        <input id="password" name="password"   type="password" class="form-control" >
+                        <span id="passwordSpan"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>收货地址：</label>
+                    </td>
+                    <td>
+                    <textarea id="address" name="address"  class="form-control" >
+                    </textarea><span id="addressSpan"></span>
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td colspan="2" style="text-align: center">
+                        <button onclick="register()" id="submit-button" type="submit" class="btn btn-info" style="width:280px;">确认</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+
+    </div>
+</div>
+</body>
+<script>
+
+    function no_submit() {
+        return false;
+    }
+    $(function(){
+        var arg=g_getQueryString("userId");
+        if (arg) {
+            $("#tip").text("资料修改");
+            getUserInfo(arg);
+        }
+        
+    });
+    function getUserInfo(arg) {
+        $.ajax({
+            url: "/user/"+arg,
+            type: "GET",
+            success:function(data){
+                if(data.code == 0){
+                    var u=data.data;
+                    $("#nickname").val(u.nickname);
+                    $("#userId").val(u.id).attr("disabled",true);
+                    $("#address").val(u.address);
+                }else{
+                    // 提示错误
+                    layer.msg(data.msg);
+                }
+            },
+            error:function(){
+                layer.closeAll();
+            }
+        });
+    }
+
+    //一定要trim()
+    function check() {
+        var userIdReg = /^1[3456789]\d{9}$/;
+        if ($("input[name='nickname']").val().trim() === "") {
+            $("form span").text("");
+            $("#nicknameSpan").text("用户名不能为空").css("color","red");
+            return false;
+        }
+        if (!userIdReg.test($("input[name='userId']").val())) {
+            $("form span").text("");
+            $("#userIdSpan").text("请输入正确手机号").css("color","red");
+            return false;
+        }
+        if ($("input[name='password']").val().trim() === "") {
+            $("form span").text("");
+            $("#passwordSpan").text("密码不能为空").css("color","red");
+            return false;
+        }
+        if ($("input[name='password']").val().trim().length<6) {
+            $("form span").text("");
+            $("#passwordSpan").text("密码不能小于6位数").css("color","red");
+            return false;
+        }
+        if ($("#address").val().trim()==="") {
+            $("form span").text("");
+            $("#addressSpan").text("地址不能为空").css("color","red");
+            return false;
+        }
+        return true;
+    }
+    function register() {
+        if (!check())
+            return;
+        g_showLoading();
+        var inputPass = $("#password").val().trim();
+        var password="";
+        if (inputPass!==undefined&&inputPass!==""){
+            var salt = g_passsword_salt;
+            var str = ""+salt.charAt(1)+salt.charAt(4)+salt.charAt(5) + inputPass  + salt.charAt(3)+ salt.charAt(1);
+            password = md5(str);
+        }
+        else {
+            password=null;
+        }
+
+        var flag=$("#userId").attr("disabled")?"?update=1":"";
+        $.ajax({
+            url: "/login/register"+flag,
+            type: "POST",
+            data:{
+                id:$("#userId").val(),
+                nickname:$("#nickname").val(),
+                password: password,
+                address:$("#address").val()
+
+            },
+            success:function(data){
+                // 关闭loading
+                layer.closeAll();
+                if(data.code == 0){
+                    layer.msg("成功,请登录");
+                    window.location.href="/login/to-login";
+                }else{
+                    // 提示错误
+                    layer.msg(data.msg);
+                }
+            },
+            error:function(){
+                layer.closeAll();
+            }
+        });
+    }
+
+</script>
+</html>

@@ -176,4 +176,21 @@ public class BuyController implements InitializingBean {
             return Result.error(CodeMsg.SERVER_ERROR);
         }
     }
+    @PostMapping(value="/buy/pay")
+    @ResponseBody
+    public Result<Boolean> pay(User user,long orderId) {
+        //支付处理
+        //...
+        //更改为已支付状态
+        int done = buyOrderService.updateStatus(orderId, 1);
+        return Result.success(done==1);
+    }
+    @PostMapping(value="/buy/finish")
+    @ResponseBody
+    public Result<Boolean> finishOrder(User user,long orderId) {
+        //更改为已支付状态
+        int done = buyOrderService.updateStatus(orderId, 2);
+        return Result.success(done==1);
+    }
+
 }

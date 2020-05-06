@@ -32,7 +32,7 @@ public class BuyService {
     @Autowired
     StringRedisTemplate template;
     @Autowired
-    OrderService orderService;
+    BuyOrderService orderService;
 
     @Transactional(rollbackFor = Exception.class)
     public OrderDetail buy(User user, ProductDTO product){
@@ -92,7 +92,7 @@ public class BuyService {
 
     public void reset(List<ProductDTO> products) {
         productService.resetStock(products);
-        orderService.deleteOrders();
+        orderService.deleteOrdersForReset();
     }
 
 

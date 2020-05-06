@@ -28,33 +28,10 @@ public class UserController {
     public Result getUser(@PathVariable long id) {
         User user = userService.findUserById(id);
         if (user!=null){
+            user.setPassword("");
             return Result.success(user);
         }
         return Result.error(CodeMsg.MOBILE_NOT_EXIST);
     }
-    @RequestMapping("/redis/set")
-    @ResponseBody
-    public Result redisSet() {
-       User user=new User();
-       user.setId(13720201236L);
-       user.setNickname("hhh");
-       redisTemplate.opsForValue().set(RedisKeyPrefix.USER_ID_PREFIX+user.getId(), JSON.toJSONString(user));
 
-       return  Result.success("成功");
-    }
-    @RequestMapping("/redis/get")
-    @ResponseBody
-    public Result redisGet() {
-        String s = redisTemplate.opsForValue().get("13720201236");
-        if (s==null){
-            return  Result.error(CodeMsg.MOBILE_NOT_EXIST);
-        }
-        return  Result.success(s);
-    }
-    @RequestMapping("/user/test")
-    @ResponseBody
-    public Result test(User user) {
-        System.out.println(user);
-        return Result.success(user);
-    }
 }

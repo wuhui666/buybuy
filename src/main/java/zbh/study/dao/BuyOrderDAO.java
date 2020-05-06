@@ -15,5 +15,7 @@ public interface BuyOrderDAO {
     long insert(BuyOrder buyOrder);
 
     @Delete("delete from buy_order")
-    public void deletebuyOrders();
+    public void deletebuyOrdersForReset();
+    @Delete("delete from buy_order where order_id=#{order_id}")
+    public void deletebuyOrdersById(long order_id);
 }

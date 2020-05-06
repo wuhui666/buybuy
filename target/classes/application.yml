@@ -1,3 +1,5 @@
+
+
 mybatis:
   type-aliases-package: zbh.study.domain
   configuration:
@@ -16,9 +18,9 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     # 下面为连接池的补充设置，应用到上面所有数据源中
     # 初始化大小，最小，最大
-    initialSize: 5
-    minIdle: 5
-    maxActive: 20
+    initialSize: 1000
+    minIdle: 2000
+    maxActive: 2000
     # 配置获取连接等待超时的时间
     maxWait: 60000
     # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
@@ -39,3 +41,14 @@ spring:
     # 合并多个DruidDataSource的监控数据
     useGlobalDataSourceStat: true
     ###############以上为配置druid添加的配置########################################
+##########Tomcat 参数调整####
+server:
+  tomcat:
+    #默认线程100，这里合理调大
+    max-threads: 500
+    #连接等待队列容量
+    accept-count: 3000
+    #最大连接数默认10000
+    max-connections: 15000
+  #连接超时
+  #connection-timeout: 5

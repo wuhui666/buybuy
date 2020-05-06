@@ -6,7 +6,9 @@ import zbh.study.dao.ProductDAO;
 import zbh.study.domain.BuyProduct;
 import zbh.study.domain.Product;
 import zbh.study.dto.ProductDTO;
+import zbh.study.vo.PublishVO;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -19,7 +21,7 @@ public class ProductService {
         return dao.getById(id);
     }
     public List<ProductDTO> listProducts(){
-        return dao.listProductDTO();
+        return dao.listProductDTO(new Date());
     }
 
     //减秒杀商品库存
@@ -39,5 +41,35 @@ public class ProductService {
             g.setBuyStock(p.getBuyStock());
             dao.resetStock(g);
         }
+    }
+
+    public void increaseStockById(long pid,int num) {
+        dao.increaseStock(pid,num);
+    }
+
+
+    public List<Product> getRest() {
+        return dao.getRest();
+    }
+
+    public Long add(Product p) {
+        return dao.insert(p);
+    }
+
+    public Product getProductById(long pid) {
+        return dao.getProductById(pid);
+    }
+
+    public int publish(PublishVO vo) {
+        return dao.insertBuyProduct(vo);
+    }
+
+    public int updatePublish(PublishVO vo) {
+
+        return dao.updatePublish(vo);
+    }
+
+    public List<ProductDTO> listProductsAll() {
+        return dao.listProductDTOAll();
     }
 }

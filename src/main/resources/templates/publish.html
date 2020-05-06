@@ -1,0 +1,296 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>活动发布</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <!-- jquery -->
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}" />
+    <script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+
+
+    <!-- jquery-validator -->
+    <script type="text/javascript" th:src="@{/jquery-validation/jquery.validate.min.js}"></script>
+    <script type="text/javascript" th:src="@{/jquery-validation/localization/messages_zh.min.js}"></script>
+    <!-- layer -->
+    <script type="text/javascript" th:src="@{/layer/layer.js}"></script>
+    <!-- md5.js -->
+    <script type="text/javascript" th:src="@{/js/md5.min.js}"></script>
+    <!-- common.js -->
+    <script type="text/javascript" th:src="@{/js/common.js}"></script>
+
+
+    <link href="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/moment.js/2.22.0/moment-with-locales.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+    <style>
+        #tableContainer{
+            margin: 5% 15% 20% 10%;
+        }
+        .tag{
+            text-align: center;
+            font-family: Cambria;
+            font-size: large;
+            font-weight: bold;
+            /*vertical-align: middle;*/
+            height: 100%;
+        }
+        .num{
+            font-family: Cambria;
+            font-weight: bold;
+            font-size: medium;
+        }
+        .line-tr{
+            margin: 4% 0% 4% 0%;
+        }
+        .word{
+            font-family: Consolas;
+            font-size: medium;
+        }
+
+    </style>
+</head>
+<body style="overflow:hidden;">
+
+<div class="panel panel-default" >
+    <div class="row" style="background-color: #269abc;color: ghostwhite">
+        <div class="col-lg-2" style="vertical-align: bottom">
+            <img id="return" src="/img/return.png" width="35px" />
+            <a href="/products/to-list"><img src="/img/home.png" width="35px"/></a>
+        </div>
+        <div style="text-align: center;vertical-align: middle;font-family: Consolas;font-weight: bold;font-size: x-large" class="col-lg-8">
+            活动发布
+        </div>
+        <div id="isLogin" style="text-align: center;vertical-align: bottom" class="col-lg-2">
+
+            <span>
+                <img src="/img/self.png" width="25px">&nbsp;
+            </span>
+            <span id="forNoLogin">
+                <a href="/login/to-login" style="text-decoration-line: none;color: ghostwhite">未登录</a>
+            </span>
+            <div id="forLogined" style="display: none" class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a id="nickname" href="/login/to-login" style="text-decoration-line: none;color: black">
+                        未登录
+                    </a>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="/order/orders_list">我的订单</a></li>
+                    <li><a id="modify">修改信息</a></li>
+                    <li>
+                        <a href="/products/detail/all">后台管理</a>
+                    </li>
+                    <li role="separator" class="divider"></li>
+                    <li id="logout"><a>退出登录</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="background-color: #c4e3f3">
+
+            <div id="tableContainer" class="row">
+                <div class="col-lg-5">
+                    <img  id="productImg" width="100%" height="100%" th:src="@{${product.productImg}}"/>
+                </div>
+                <div class="col-lg-7">
+                    <div class="row line-tr">
+                        <div class="col-lg-3 tag">
+                            商品名称
+                        </div>
+                        <div  th:text="${product.productName}" class="col-lg-9 word">
+                            <input id="productName"/>
+                        </div>
+                    </div>
+                    <div class="row line-tr">
+                        <div class="col-lg-3 tag">
+                            商品描述
+                        </div>
+                        <div  th:text="${product.productDetail}" class="col-lg-9 word">
+                            <textarea id="productDetail">
+                            </textarea>
+                        </div>
+                    </div>
+                    <div class="row line-tr">
+                        <div class="col-lg-3 tag">
+                            秒杀价格
+                        </div>
+                        <div   class="col-lg-9 num" style="padding-left: 0px ">
+                            <input  th:value="${isUpdate?product.buyPrice:''}" id="buyPrice" name="buyPrice" style="width: 20%">
+
+                            <span id="buyPriceSpan" class="tip"></span>
+                        </div>
+
+                    </div>
+                    <div class="row line-tr">
+                        <div class="col-lg-3 tag">
+                            库存设置
+                        </div>
+                        <div  class="col-lg-9 num" style="padding-left: 0px ">
+                            <input th:value="${isUpdate?product.buyStock:''}" id="buyStock" name="buyStock" style="width: 20%">
+                            <span id="buyStockSpan" class="tip"></span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row line-tr">
+                        <div class="col-lg-3 tag">
+                            开始时间
+                        </div>
+
+                        <div class='col-lg-4 input-group date' id='startDate' >
+                            <input th:value="${isUpdate?#dates.format(product.startDate, 'yyyy-MM-dd HH:mm'):''}" type='text' class="form-control col-lg-2"/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row line-tr">
+                        <div class="col-lg-3 tag">
+                            结束时间
+                        </div>
+                        <div class='col-lg-4 input-group' id='endDate'>
+                            <input  th:value="${isUpdate?#dates.format(product.endDate, 'yyyy-MM-dd HH:mm'):''}" type='text' class="form-control"/>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row line-tr">
+                        <div class="col-lg-12" style="text-align: center">
+                            <div class="col-lg-6 col-lg-offset-1">
+                                <button style="width: 60%"  th:onclick="publish()"
+                                        class="btn-info btn-lg" id="do-publish"
+                                        th:flag="${isUpdate}" th:text="${isUpdate?'更新':'发布'}"></button>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+    </div>
+
+</div>
+</body>
+<script>
+
+    //一定要trim()
+    function check() {
+        var numReg = /^\+?[1-9][0-9]*$/;
+        var priceReg = /^[1-9]+\d*(\.\d{0,2})?$|^0?\.\d{0,2}$/;
+
+        if (!priceReg.test($("input[name='buyPrice']").val())||$("input[name='buyPrice']").val().trim() === "") {
+            $(".tip").text("");
+            $("#buyPriceSpan").text("请输入正确格式数字作为价格").css("color","red");
+            return false;
+        }
+        if (!numReg.test($("input[name='buyStock']").val())||$("input[name='buyStock']").val().trim() === "") {
+            $(".tip").text("");
+            $("#buyStockSpan").text("请输入正确格式数字作为库存").css("color","red");
+            return false;
+        }
+        var start=$("#startDate").find("input").val().trim();
+        var end=$("#endDate").find("input").val().trim();
+        if ( start === "") {
+            $(".tip").text("");
+           layer.msg("开始时间不能为空")
+            return false;
+        }
+        if (end === "") {
+            $(".tip").text("");
+            layer.msg("结束时间不能为空")
+            return false;
+        }
+        if (start>=end){
+            $(".tip").text("");
+            layer.msg("结束时间要大于开始时间")
+            return false;
+        }
+
+        return true;
+    }
+    //新增
+    function publish(){
+       if (check()){
+           g_showLoading();
+           $.ajax({
+               url: "/products/publish?isUpdate="+$("#do-publish").attr("flag"),
+               type: "POST",
+               data: {
+                    productId:g_getQueryString("productId"),
+                    buyStock:$("#buyStock").val(),
+                    buyPrice:$("#buyPrice").val(),
+                    startDate:$("#startDate").find("input").val(),
+                    endDate:$("#endDate").find("input").val()
+               },
+               success: function (data) {
+                   // 关闭loading
+                   layer.closeAll();
+                   if (data.code == 0) {
+                       layer.msg("操作成功");
+                       setTimeout(function () {
+                           window.location.href = "/products/detail/all";
+                       },1500)
+
+                   } else {
+                       // 提示错误
+                       layer.msg(data.msg);
+                   }
+               },
+               error: function () {
+                   layer.closeAll();
+               }
+           });
+       }
+    }
+
+    //return
+    $("#return").click(function () {
+        window.history.back()
+    })
+    //logout
+    $("#logout").click(function () {
+        $.ajax({
+            url: "/login/do-logout",
+            type: "POST",
+            data:{
+                userId:$("#nickname").attr("user-id")
+            },
+            success:function(data){
+
+                if(data.code == 0){
+                    window.location.reload();
+                }else{
+                    // 提示错误
+                    layer.msg(data.msg);
+                }
+            },
+            error:function(){
+                layer.msg("出错了，刷新重试");
+            }
+        });
+    })
+    //....
+    $(function () {
+
+        $('#startDate').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm',
+            locale: moment.locale('zh-tw')
+        });
+        $('#endDate').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm',
+            locale: moment.locale('zh-tw')
+        });
+    });
+</script>
+</html>

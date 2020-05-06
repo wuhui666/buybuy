@@ -17,271 +17,412 @@
     <script type="text/javascript" src="/js/md5.min.js"></script>
     <!-- common.js -->
     <script type="text/javascript" src="js/common.js"></script>
+    <style>
+        #tableContainer{
+            margin: 5% 15% 20% 10%;
+        }
+        .tag{
+            text-align: center;
+            font-family: Cambria;
+            font-size: large;
+            font-weight: bold;
+            /*vertical-align: middle;*/
+            height: 100%;
+        }
+        .num{
+            font-family: Cambria;
+            font-weight: bold;
+            font-size: medium;
+        }
+        .line-tr{
+            margin: 4% 0% 4% 0%;
+        }
+        .word{
+            font-family: Consolas;
+            font-size: medium;
+        }
+
+    </style>
 </head>
-<body>
+<body style="overflow:hidden;">
 
 <div class="panel panel-default" >
-  <div class="panel-heading">秒杀商品详情</div>
-  <div class="panel-body">
-  	<span id="userTip"> 您还没有<a href="/login/to-login">登录</a>，请登陆后再操作<br/></span>
-  </div>
-  <table class="table" id="productlist">
-  	<tr>  
-        <td>商品名称</td>  
-        <td colspan="3" id="productName"></td> 
-     </tr>  
-     <tr>  
-        <td>商品图片</td>  
-        <td colspan="3"><img  id="productImg" width="200" height="200" /></td>  
-     </tr>
-     <tr>  
-        <td>秒杀开始时间</td>  
-        <td id="buyStart"></td>
-        <td >	
-        	<input type="hidden" id="remainSeconds" />
-        	<span id="productTip"></span>
-        </td>
-        <td>
-            <div class="row">
-                <div class="form-inline" style="text-align: center">
-                    <img alt="请登录" id="verifyCodeImg" width="90" height="33"  style="display:none" onclick="refreshVerifyCode()"/>
-                    <input id="verifyCode"  class="form-control" style="display:none;width: 20%"/>
-                    <button class="btn btn-primary btn-block form-control" type="button" id="buyButton"onclick="getBuyPath()">立即秒杀</button>
+    <div class="row" style="background-color: #269abc;color: ghostwhite">
+        <div class="col-lg-2" style="vertical-align: bottom">
+            <img id="return" src="img/return.png" width="35px" />
+            <a href="/products/to-list"><img src="img/home.png" width="35px"/></a>
+        </div>
+        <div style="text-align: center;vertical-align: middle;font-family: Consolas;font-weight: bold;font-size: x-large" class="col-lg-8">
+            秒杀商品详情
+        </div>
+        <div id="isLogin" style="text-align: center;vertical-align: bottom" class="col-lg-2">
 
-                </div>
-
+            <span>
+                <img src="img/self.png" width="25px">&nbsp;
+            </span>
+            <span id="forNoLogin">
+                <a href="/login/to-login" style="text-decoration-line: none;color: ghostwhite">未登录</a>
+            </span>
+            <div id="forLogined" style="display: none" class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a id="nickname" href="/login/to-login" style="text-decoration-line: none;color: black">
+                        未登录
+                    </a>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="/order/orders_list">我的订单</a></li>
+                    <li><a id="modify">修改信息</a></li>
+                    <li>
+                        <a href="/products/detail/all">后台管理</a>
+                    </li>
+                    <li role="separator" class="divider"></li>
+                    <li id="logout"><a>退出登录</a></li>
+                </ul>
             </div>
-            <input type="hidden" name="productId"  id="productId" />
-        </td>
-     </tr>
-     <tr>  
-        <td>商品原价</td>  
-        <td colspan="3" id="productPrice"></td>
-     </tr>
-      <tr>  
-        <td>秒杀价</td>  
-        <td colspan="3"  id="buyPrice"></td>
-     </tr>
-     <tr>  
-        <td>库存数量</td>  
-        <td colspan="3"  id="buyStock"></td>
-     </tr>
-  </table>
+        </div>
+    </div>
+
+    <div class="row" style="background-color: #c4e3f3">
+
+            <div id="tableContainer" class="row">
+                <div class="col-lg-5">
+                    <img  id="productImg" width="100%" height="100%" />
+                </div>
+                <div class="col-lg-7">
+                    <div class="row line-tr">
+                        <div class="col-lg-3 tag">
+                            商品名称
+                        </div>
+                        <div id="productName" class="col-lg-9 word">
+
+                        </div>
+                    </div>
+                    <div class="row line-tr">
+                        <div class="col-lg-3 tag">
+                            商品描述
+                        </div>
+                        <div id="productDetail" class="col-lg-9 word">
+
+                        </div>
+                    </div>
+                    <div class="row line-tr">
+                        <div class="col-lg-3 tag">
+                            开始时间
+                        </div>
+                        <div id="buyStart" class="col-lg-9 num">
+
+                        </div>
+
+
+                    </div>
+                    <div class="row line-tr">
+                        <div class="col-lg-3 tag">
+                            商品原价
+                        </div>
+                        <div id="productPrice" class="col-lg-9 num">
+                            3999
+                        </div>
+                    </div>
+                    <div class="row line-tr">
+                        <div class="col-lg-3 tag">
+                            秒杀价格
+                        </div>
+                        <div id="buyPrice" class="col-lg-9 num" style="color: red ">
+                            3333
+                        </div>
+                    </div>
+                    <div class="row line-tr">
+                        <div class="col-lg-3 tag">
+                            库存数量
+                        </div>
+                        <div id="buyStock" class="col-lg-3 word">
+                            99999
+                        </div>
+
+                    </div>
+                    <div class="row line-tr">
+                        <div class="col-lg-3 tag">
+                           抢购状态
+                        </div>
+                        <div class="col-lg-3 word" style="padding: 0 0 0 0px">
+                            <input type="hidden" id="remainSeconds" />
+                            <img id="hot" src="img/hot.gif"/>
+                            <span id="productTip">
+
+                            </span>
+                        </div>
+                        <div class="col-lg-6" style="padding: 0 0 0 0px">
+                            <div class="row">
+                                <div class="form-inline" style="text-align: center">
+                                    <img alt="请登录" id="verifyCodeImg" width="90" height="33"  style="display:none" onclick="refreshVerifyCode()"/>
+                                    <input id="verifyCode"  class="form-control" style="display:none;width: 20%" placeholder="验证码"/>
+                                    <button class="btn btn-primary btn-block form-control" type="button" id="buyButton"onclick="getBuyPath()">立即秒杀</button>
+
+                                </div>
+                                <input type="hidden" name="productId"  id="productId" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+
 </div>
 </body>
 <script>
-function getBuyPath(){
-    var productId = $("#productId").val();
-    if ($("#verifyCode").val()===""){
-        layer.msg("请输入验证码");
-        return;
-    }
-    g_showLoading();
-    $.ajax({
-        url:"/buy/path",
-        type:"GET",
-        data:{
-            productId:productId,
-            verifyCode:$("#verifyCode").val()
-        },
-        success:function(data){
-            // 获得接口路径
-            if(data.code == 0){
-                var path = data.data;
-                dobuy(path);
-            }else{
-                layer.msg(data.msg);
-            }
-        },
-        error:function(){
-            layer.msg("客户端请求有误");
+    function getBuyPath(){
+        var productId = $("#productId").val();
+        var code=$("#verifyCode").val();
+        if (code===""){
+            layer.msg("请输入验证码");
+            return;
         }
-    });
-}
-
-function getbuyResult(productId,flag){
-    // 避免重复开启弹窗，影响体验
-    if (flag===1) {
+        if (!/^\d|-[1-9]\d*$/.test(code)) {
+            layer.msg("验证码格式错误");
+            return;
+        }
         g_showLoading();
-    }
-	$.ajax({
-		url:"/buy/result",
-		type:"GET",
-		data:{
-            productId:$("#productId").val(),
-		},
-		success:function(data){
-			if(data.code == 0){
-				var result = data.data;
-				if(result === -1){
-					layer.msg("对不起，库存不足了");
-				}
-				else if(result === -2){
-                    layer.msg("出错啦，刷新页面重试");
+        $.ajax({
+            url:"/buy/path",
+            type:"GET",
+            data:{
+                productId:productId,
+                verifyCode:$("#verifyCode").val()
+            },
+            success:function(data){
+                // 获得接口路径
+                if(data.code == 0){
+                    var path = data.data;
+                    dobuy(path);
+                }else{
+                    layer.msg(data.msg);
                 }
-				else if(result == 0){//继续轮询
-					setTimeout(function(){
-						getbuyResult(productId);
-					}, 1500);
-				}else{
-					layer.confirm("恭喜你，秒杀成功！查看订单？", {btn:["确定","取消"]},
-							function(){
-								window.location.href="/order_detail.htm?orderId="+result;
-							},
-							function(){
-								layer.closeAll();
-								window.location.reload();
-							});
-				}
-			}
-			else{
-				layer.msg(data.msg);
-			}
-		},
-		error:function(){
-			layer.msg("客户端请求有误");
-		}
-	});
-}
-
-function dobuy(path){
-	$.ajax({
-		url:"/"+path+"/buy/",
-		type:"POST",
-		data:{
-            productId:$("#productId").val(),
-		},
-		success:function(data){
-		    // 排队
-			if(data.code == 0){
-				//window.location.href="/order_detail.htm?orderId="+data.data.id;
-				getbuyResult($("#productId").val(),1);
-			}
-			else{
-			    // 其他失败信息
-				layer.msg(data.msg);
-			}
-		},
-		error:function(){
-			layer.msg("请求有误");
-		}
-	});
-	
-}
-
-
-
-$(function(){
-	//countDown();
-	getDetail();
-});
-
-function getDetail(){
-	var productId = g_getQueryString("productId");
-	$.ajax({
-		url:"/products/detail/"+productId,
-		type:"GET",
-		success:function(data){
-			if(data.code == 0){
-				render(data.data);
-			}else{
-				layer.msg(data.msg);
-			}
-		},
-		error:function(){
-			layer.msg("客户端请求有误");
-		}
-	});
-}
-function render(detail){
-    var buyStatus = detail.buyStatus;
-    var  remainSeconds = detail.remainSeconds;
-    //如果remainSeconds=0代表已结束
-    if (buyStatus===1&&remainSeconds===0){
-
-    }
-    //否则
-    else{
-        var productDTO = detail.productDTO;
-        var user = detail.user;
-        if(user){
-            $("#userTip").hide();
-        }
-        $("#productName").text(productDTO.productName);
-        $("#productImg").attr("src", productDTO.productImg);
-        $("#buyStart").text(formatDate(new Date(productDTO.startDate)));
-        //还有多久开始或者还有多久结束
-        $("#remainSeconds").val(remainSeconds);
-
-        $("#productId").val(productDTO.id);
-        $("#productPrice").text(productDTO.productPrice);
-        $("#buyPrice").text(productDTO.buyPrice);
-        $("#buyStock").text(productDTO.buyStock);
-        countDown();
+            },
+            error:function(){
+                layer.msg("客户端请求有误");
+            }
+        });
     }
 
-}
-function countDown(){
-	var remainSeconds = $("#remainSeconds").val();
-	var timeout;
-	var timeout2;
-	if(remainSeconds > 0){//秒杀还没开始，倒计时
-		$("#buyButton").attr("disabled", true);
-	   $("#productTip").html("秒杀倒计时："+formatCountDate(remainSeconds));
-		timeout = setTimeout(function(){
-			$("#remainSeconds").val(remainSeconds - 1);
-			countDown();
-		},1000);
-	}else if(remainSeconds < 0){//秒杀进行中
-		$("#buyButton").attr("disabled", false);
-		$("#productTip").html("秒杀进行中,剩余"+formatCountDate(Math.abs(remainSeconds)));
-        if(timeout){
-            clearTimeout(timeout);
+    function getbuyResult(productId,flag){
+        // 避免重复开启弹窗，影响体验
+        if (flag===1) {
+            g_showLoading();
         }
-        timeout2=setTimeout(function(){
-            //js的+号有点坑啊，记得*1
-            $("#remainSeconds").val(remainSeconds*1 + 1);
+        $.ajax({
+            url:"/buy/result",
+            type:"GET",
+            data:{
+                productId:$("#productId").val(),
+            },
+            success:function(data){
+                if(data.code == 0){
+                    var result = data.data;
+                    if(result === -1){
+                        layer.msg("对不起，库存不足了");
+                    }
+                    else if(result === -2){
+                        layer.msg("出错啦，刷新页面重试");
+                    }
+                    else if(result == 0){//继续轮询
+                        setTimeout(function(){
+                            getbuyResult(productId);
+                        }, 1500);
+                    }else{
+                        layer.confirm("恭喜你，秒杀成功！查看订单？", {btn:["确定","取消"]},
+                            function(){
+                                window.location.href="/order_detail.htm?orderId="+result;
+                            },
+                            function(){
+                                layer.closeAll();
+                                window.location.reload();
+                            });
+                    }
+                }
+                else{
+                    layer.msg(data.msg);
+                }
+            },
+            error:function(){
+                layer.msg("客户端请求有误");
+            }
+        });
+    }
+
+    function dobuy(path){
+        $.ajax({
+            url:"/"+path+"/buy/",
+            type:"POST",
+            data:{
+                productId:$("#productId").val()
+            },
+            success:function(data){
+                // 排队
+                if(data.code == 0){
+                    //window.location.href="/order_detail.htm?orderId="+data.data.id;
+                    getbuyResult($("#productId").val(),1);
+                }
+                else{
+                    // 其他失败信息
+                    layer.msg(data.msg);
+                }
+            },
+            error:function(){
+                layer.msg("请求有误");
+            }
+        });
+
+    }
+
+
+
+    $(function(){
+        //countDown();
+        getDetail();
+    });
+
+    function getDetail(){
+        var productId = g_getQueryString("productId");
+        $.ajax({
+            url:"/products/detail/"+productId,
+            type:"GET",
+            success:function(data){
+                if(data.code == 0){
+                    render(data.data);
+                }else{
+                    layer.msg(data.msg);
+                }
+            },
+            error:function(){
+                layer.msg("客户端请求有误");
+            }
+        });
+    }
+    function render(detail){
+        var buyStatus = detail.buyStatus;
+        var  remainSeconds = detail.remainSeconds;
+        //如果remainSeconds=0代表已结束
+        if (buyStatus===1&&remainSeconds===0){
+
+        }
+        //否则
+        else{
+            var productDTO = detail.productDTO;
+            var user = detail.user;
+            if(user){
+                $("#nickname").text(user.nickname).removeAttr("href","").attr("user-id",user.id);
+                $("#forLogined").css("display","inline-block");
+                $("#modify").attr("href","register.htm?userId="+user.id);
+
+                $("#forNoLogin").css("display","none");
+                if (user.salt!=="admin666"){
+                    $("#manage").css("display","none");
+                }
+            }
+            $("#productName").text(productDTO.productName);
+            $("#productImg").attr("src", productDTO.productImg);
+            $("#productDetail").text(productDTO.productDetail);
+            $("#buyStart").text(formatDate(new Date(productDTO.startDate)));
+            //还有多久开始或者还有多久结束
+            $("#remainSeconds").val(remainSeconds);
+            $("#productId").val(productDTO.id);
+            $("#productPrice").text(productDTO.productPrice+"元").css("text-decoration","line-through");
+            $("#buyPrice").text(productDTO.buyPrice+"元");
+            $("#buyStock").text(productDTO.buyStock);
             countDown();
-        },1000);
-        $("#verifyCodeImg").attr("src", "/buy/verifyCode?productId="+$("#productId").val());
-        $("#verifyCodeImg").show();
-        $("#verifyCode").show();
-	}else{//秒杀已经结束
-
-        if(timeout2){
-            clearTimeout(timeout2);
         }
-		$("#buyButton").attr("disabled", true);
-		$("#productTip").html("秒杀已经结束");
-        $("#verifyCodeImg").hide();
-        $("#verifyCode").hide();
-	}
-}
-function refreshVerifyCode(){
-    $("#verifyCodeImg").attr("src", "/buy/verifyCode?productId="+$("#productId").val()+"&timestamp="+new Date().getTime());
-}
-function formatDate(time) {
-    var y = time.getFullYear();
-    var m = time.getMonth() + 1;
-    var d = time.getDate();
-    var h = time.getHours();
-    var mm = time.getMinutes();
-    var s = time.getSeconds();
-    return y + '-' + add0(m) + '-' + add0(d) + ' ' + add0(h) + ':' + add0(mm) + ':' + add0(s);
-}
-//格式化倒计时
-function formatCountDate(time) {
-    var total_day=Math.floor(time/(24*60*60));
-    var total_other=time%(24*60*60);
-    var h=Math.floor(total_other/(60*60));
-    total_other=total_other%(60*60);
-    var mm=Math.floor(total_other/60);
-    total_other=total_other%60;
-    var s=total_other;
-    return total_day+"天" + add0(h) +"时"+add0(mm)+"分"+add0(s)+"秒";
-}
-function add0(m) {
-    return m < 10 ? '0' + m : m;
-}
+
+    }
+    function countDown(){
+        var remainSeconds = $("#remainSeconds").val();
+        var timeout;
+        var timeout2;
+        if(remainSeconds > 0){//秒杀还没开始，倒计时
+            $("#buyButton").attr("disabled", true);
+            $("#productTip").html("秒杀倒计时："+formatCountDate(remainSeconds));
+            timeout = setTimeout(function(){
+                $("#remainSeconds").val(remainSeconds - 1);
+                countDown();
+            },1000);
+        }else if(remainSeconds < 0){//秒杀进行中
+            $("#buyButton").attr("disabled", false);
+            $("#productTip").html("秒杀进行中,剩余"+formatCountDate(Math.abs(remainSeconds)));
+
+            timeout2=setTimeout(function(){
+                //js的+号有点坑啊，记得*1
+                $("#remainSeconds").val(remainSeconds*1 + 1);
+                countDown();
+            },1000);
+            // 定时器等待1s的时候后面的代码会执行的
+            //由于第一次src属性不存在，所以是undefined
+            //第一次才改动src
+            if ($("#verifyCodeImg").attr("src")===undefined) {
+                $("#verifyCodeImg").attr("src", "/buy/verifyCode?productId="+$("#productId").val());
+            }
+
+            $("#verifyCodeImg").show();
+            $("#verifyCode").show();
+        }else{//秒杀已经结束
+            $("#buyButton").hide();
+            $("#productTip").html("秒杀已经结束");
+            $("#verifyCodeImg").hide();
+            $("#verifyCode").hide();
+            $("#hot").hide()
+        }
+    }
+    function refreshVerifyCode(){
+        //时间戳确保不会使用浏览器缓存图片，每次都是重新调接口
+        $("#verifyCodeImg").attr("src", "/buy/verifyCode?productId="+$("#productId").val()+"&timestamp="+new Date().getTime());
+    }
+    function formatDate(time) {
+        var y = time.getFullYear();
+        var m = time.getMonth() + 1;
+        var d = time.getDate();
+        var h = time.getHours();
+        var mm = time.getMinutes();
+        var s = time.getSeconds();
+        return y + '-' + add0(m) + '-' + add0(d) + ' ' + add0(h) + ':' + add0(mm) + ':' + add0(s);
+    }
+    //格式化倒计时
+    function formatCountDate(time) {
+        var total_day=Math.floor(time/(24*60*60));
+        var total_other=time%(24*60*60);
+        var h=Math.floor(total_other/(60*60));
+        total_other=total_other%(60*60);
+        var mm=Math.floor(total_other/60);
+        total_other=total_other%60;
+        var s=total_other;
+        return total_day+"天" + add0(h) +"时"+add0(mm)+"分"+add0(s)+"秒";
+    }
+    function add0(m) {
+        return m < 10 ? '0' + m : m;
+    }
+    //return
+    $("#return").click(function () {
+        window.history.back()
+    })
+    //logout
+    $("#logout").click(function () {
+        $.ajax({
+            url: "/login/do-logout",
+            type: "POST",
+            data:{
+                userId:$("#nickname").attr("user-id")
+            },
+            success:function(data){
+
+                if(data.code == 0){
+                    window.location.reload();
+                }else{
+                    // 提示错误
+                    layer.msg(data.msg);
+                }
+            },
+            error:function(){
+                layer.msg("出错了，刷新重试");
+            }
+        });
+    })
 </script>
 </html>

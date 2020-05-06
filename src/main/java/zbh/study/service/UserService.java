@@ -18,7 +18,10 @@ import zbh.study.util.TokenUtil;
 import zbh.study.vo.LoginVO;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 
@@ -68,9 +71,12 @@ public class UserService {
         if(!resultPass.equals(dbPass)) {
             throw new GlobalException(CodeMsg.PASSWORD_ERROR);
         }
+
         //生成cookie
         String token = TokenUtil.generateToken();
         addCookie(response, token, user);
+        //删除redis页面缓存
+        template.delete(RedisKeyPrefix.PAGE_PREFIX+"productList");
         return true;
     }
     private void addCookie(HttpServletResponse response, String token, User user) {
@@ -82,5 +88,58 @@ public class UserService {
         // 根路径，所以应用共享
         cookie.setPath("/");
         response.addCookie(cookie);
+    }
+
+    public Boolean logout(HttpServletRequest request,HttpServletResponse response, long userId) {
+        Cookie[] cookies=request.getCookies();
+        String token="";
+        for (int i = 0; i < cookies.length; i++) {
+            if (cookies[i].getName().equals("_token")){
+                token=cookies[i].getValue();
+                break;
+            }
+
+        }
+        //删token、页面缓存
+        template.delete(RedisKeyPrefix.USER_TOKEN_PREFIX+token);
+        template.delete(RedisKeyPrefix.PAGE_PREFIX+"productList");
+        //删浏览器cookie，同名覆盖，超时间接删除
+        Cookie cookie = new Cookie(COOKIE_NAME_TOKEN, token);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        return true;
+    }
+
+    public Boolean register(User u) {
+        if(u == null) {
+            throw new GlobalException(CodeMsg.SERVER_ERROR);
+        }
+        u.setRegisterDate(new Date());
+        String formPass = u.getPassword();
+        //判断手机号是否存在
+        User user = dao.findUserById(u.getId());
+        if(user != null) {
+            throw new GlobalException(CodeMsg.MOBILE_HAS_EXIST);
+        }
+        // 随机用户盐
+        String salt = UUID.randomUUID().toString().substring(3,12);
+        u.setSalt(salt);
+        // 二次加密设为密码
+        String resultPass = MD5Util.formPassToDBPass(formPass, salt);
+        u.setPassword(resultPass);
+        return dao.addUser(u)==1;
+    }
+
+    public int update(User u) {
+        User user=dao.findUserById(u.getId());
+
+        // 用户盐
+        String salt = user.getSalt();
+        // 二次加密设为密码
+        String resultPass = MD5Util.formPassToDBPass(u.getPassword(), salt);
+        u.setPassword(resultPass);
+
+
+        return dao.updateById(u);
     }
 }

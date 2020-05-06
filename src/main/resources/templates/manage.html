@@ -1,0 +1,149 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>后台管理</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <!-- jquery -->
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css" />
+    <script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+    <!-- jquery-validator -->
+    <script type="text/javascript" src="/jquery-validation/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/jquery-validation/localization/messages_zh.min.js"></script>
+    <!-- layer -->
+    <script type="text/javascript" src="/layer/layer.js"></script>
+    <!-- md5.js -->
+    <script type="text/javascript" src="/js/md5.min.js"></script>
+    <!-- common.js -->
+    <script type="text/javascript" src="/js/common.js"></script>
+    <style>
+        html,body{
+            height:100%;
+            width:100%;
+        }
+        body{
+            background:url('/img/bg3.png') no-repeat;
+            background-size:100% 100%;
+        }
+        #productList td{
+            border-top:1px solid #39503f61;
+        }
+        td {
+            text-align: center;
+        }
+        #head td{
+            font-size: medium;
+            font-weight: bolder;
+        }
+    </style>
+</head>
+<body>
+<div class="row" style="height:100%;background-color:rgba(222,222,222,0.8);">
+
+    <div th:class="row" style="background-color: #269abc;color: ghostwhite">
+        <div class="col-lg-2" style="vertical-align: bottom">
+            <img style="margin-left: 10px" id="return" src="/img/return.png" width="35px" />
+            <a href="/products/to-list"><img src="/img/home.png" width="35px"/></a>
+            <a href="/products/manage-list" style="text-decoration-line: none;color: ghostwhite">
+                <img title="发布活动" src="/img/plus.png" width="35px"/>
+            </a>
+        </div>
+        <div style="text-align: center;vertical-align: middle;font-family: Consolas;font-weight: bold;font-size: x-large" th:class="col-lg-8">
+            活动管理
+        </div>
+        <div style="text-align: center;vertical-align: bottom" th:class="col-lg-2">
+            <img src="/img/self.png" width="25px">&nbsp;
+            <div th:if="${user != null}" class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a th:user-id="${user.id}" th:text="${user.nickname}" id="nickname" href="/login/to-login" style="text-decoration-line: none;color: black">
+
+                    </a>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="/order/orders_list">我的订单</a></li>
+                    <li><a th:href="'/register.htm?userId='+${user.id}">修改信息</a></li>
+                    <li th:if="${user.salt=='admin666'}">
+                        <a href="/products/detail/all">后台管理</a>
+                    </li>
+
+                    <li role="separator" class="divider"></li>
+                    <li id="logout"><a>退出登录</a></li>
+                </ul>
+            </div>
+            <span th:if="${user == null}">
+                <a href="/login/to-login" style="text-decoration-line: none;color: ghostwhite">未登录</a>
+            </span>
+
+        </div>
+    </div>
+
+
+    <div th:class="row">
+        <table class="table" id="productList">
+            <tr id="head">
+
+                <td style="text-align: center">活动图片</td>
+                <td style="width: 20%">活动商品</td>
+                <td style="width: 20%">初始库存</td>
+                <td>活动状态</td>
+                <td>操作</td>
+            </tr>
+            <tr th:if="${productDTOList!=null}"  th:each="od,odStat : ${productDTOList}">
+
+                <td><img th:src="@{${od.productImg}}" width="100" height="100" /></td>
+                <td style="font-size: large;color: #555555;vertical-align: middle" th:text="${od.productName}"></td>
+                <td style="font-size: large;font-family: Cambria;vertical-align: middle" th:text="${od.buyStock}+' 件'"></td>
+                <td style="font-size: large;font-family: Cambria;vertical-align: middle" >
+                    <span th:if="${od.startDate.getTime() ge new java.util.Date().getTime()}" th:text="未开始"></span>
+                    <span th:if="${od.endDate.getTime() le new java.util.Date().getTime()}" th:text="已结束"></span>
+                    <span th:if="${od.startDate.getTime() lt new java.util.Date().getTime()
+                     and (od.endDate.getTime() gt new java.util.Date().getTime())}"
+                          th:text="进行中"></span>
+
+                </td>
+                <td style="font-size: large;font-family: Cambria;vertical-align: middle">
+                    <button th:class="btn-primary">
+                        <a style="color: white;text-decoration-line: none" th:href="'/products/to-publish?productId='+${od.id}+'&&update=true'">修改活动</a>
+                    </button>
+
+                </td>
+            </tr>
+            <tr th:if="${productDTOList.size()==0}">
+                <td colspan="5" style="font-size: large;color: #555555;vertical-align: middle" th:text="暂时木有活动"></td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+</body>
+<script>
+    //return
+    $("#return").click(function () {
+        window.history.back()
+    });
+    $("#logout").click(function () {
+        $.ajax({
+            url: "/login/do-logout",
+            type: "POST",
+            data:{
+                userId:$("#nickname").attr("user-id")
+            },
+            success:function(data){
+
+                if(data.code == 0){
+                    window.location.reload();
+                }else{
+                    // 提示错误
+                    layer.msg(data.msg);
+                }
+            },
+            error:function(){
+                layer.msg("出错了，刷新重试");
+            }
+        });
+    })
+</script>
+</html>

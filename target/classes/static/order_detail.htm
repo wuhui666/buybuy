@@ -17,66 +17,140 @@
     <script type="text/javascript" src="/js/md5.min.js"></script>
     <!-- common.js -->
     <script type="text/javascript" src="/js/common.js"></script>
+    <style>
+        #tableContainer{
+            margin: 5% 15% 20% 10%;
+        }
+        .tag{
+            text-align: center;
+            font-family: Cambria;
+            font-size: large;
+            font-weight: bold;
+            /*vertical-align: middle;*/
+            height: 100%;
+        }
+        .num{
+            font-family: Cambria;
+            font-weight: bold;
+            font-size: medium;
+        }
+        .line-tr{
+            margin: 6% 0% 6% 0%;
+        }
+        .word{
+            font-family: Consolas;
+            font-size: medium;
+        }
+
+    </style>
 </head>
 <body>
 <div class="panel panel-default" >
-  <div class="panel-heading">秒杀订单详情</div>
-  <table class="table" id="productlist">
-        <tr>  
-        <td>商品名称</td>  
-        <td colspan="3" id="productName"></td> 
-     </tr>  
-     <tr>  
-        <td>商品图片</td>  
-        <td colspan="2"><img  id="productImg" width="200" height="200" /></td>  
-     </tr>
-      <tr>  
-        <td>订单价格</td>  
-        <td colspan="2"  id="productPrice"></td>  
-     </tr>
-     <tr>
-     		<td>下单时间</td>  
-        	<td id="createDate" colspan="2"></td>  
-     </tr>
-     <tr>
-     	<td>订单状态</td>  
-        <td id="status">
-        </td>  
-        <td>
-        	<button class="btn btn-primary btn-block" type="submit" id="payButton">立即支付</button>
-        </td>
-     </tr>
-      <tr>
-     		<td>收货人</td>  
-        	<td colspan="2">13134646456</td>
-     </tr>
-     <tr>
-     		<td>收货地址</td>  
-        	<td colspan="2">武汉市湖北工业大学</td>
-     </tr>
-  </table>
+    <div class="row" style="background-color: #269abc;color: ghostwhite">
+        <div class="col-lg-2" style="vertical-align: bottom">
+            <img id="return" src="img/return.png" width="35px" />
+            <a href="/products/to-list"><img src="img/home.png" width="35px"/></a>
+        </div>
+        <div style="text-align: center;vertical-align: middle;font-family: Consolas;font-weight: bold;font-size: x-large" class="col-lg-8">
+            秒杀订单详情
+        </div>
+        <div id="isLogin" style="text-align: center;vertical-align: bottom" class="col-lg-2">
+
+            <span>
+                <img src="img/self.png" width="25px">&nbsp;
+            </span>
+            <span id="forNoLogin">
+                <a href="/login/to-login" style="text-decoration-line: none;color: ghostwhite">未登录</a>
+            </span>
+            <div id="forLogined" style="display: none" class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a id="nickname" href="/login/to-login" style="text-decoration-line: none;color: black">
+                        未登录
+                    </a>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="/order/orders_list">我的订单</a></li>
+                    <li><a id="modify">修改信息</a></li>
+                    <li>
+                        <a href="/products/detail/all">后台管理</a>
+                    </li>
+                    <li role="separator" class="divider"></li>
+                    <li id="logout"><a>退出登录</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="background-color: #c4e3f3">
+
+        <div id="tableContainer" class="row">
+            <div class="col-lg-5">
+                <img  id="productImg" width="100%" height="100%" />
+            </div>
+            <div class="col-lg-7">
+                <div class="row line-tr">
+                    <div class="col-lg-3 tag">
+                        商品名称
+                    </div>
+                    <div id="productName" class="col-lg-9 word">
+                    </div>
+                </div>
+                <div class="row line-tr">
+                    <div class="col-lg-3 tag">
+                        商品价格
+                    </div>
+                    <div id="productPrice" class="col-lg-9 word">
+                    </div>
+                </div>
+                <div class="row line-tr">
+                    <div class="col-lg-3 tag">
+                        下单时间
+                    </div>
+                    <div id="createDate" class="col-lg-3 num">
+
+                    </div>
+                    <div id="payTips" class="col-lg-6" style="color: red;">
+                        订单将在<span id="payTimeTips"></span>后失效，请尽快完成支付！
+                    </div>
+
+
+                </div>
+                <div class="row line-tr">
+                    <div class="col-lg-3 tag">
+                        订单状态
+                    </div>
+                    <div id="status" class="col-lg-3 num">
+
+                    </div>
+                    <div class="col-lg-6">
+                        <button class="btn btn-primary btn-block" type="submit" id="payButton" onclick="pay()">立即支付</button>
+                    </div>
+                </div>
+                <div class="row line-tr">
+                    <div class="col-lg-3 tag">
+                        收货电话
+                    </div>
+                    <div id="phone" class="col-lg-9 num">
+
+                    </div>
+                </div>
+                <div class="row line-tr">
+                    <div class="col-lg-3 tag">
+                        收获地址
+                    </div>
+                    <div id="address" class="col-lg-9 word">
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>
 <script>
-
-function render(detail){
-	var productDTO = detail.productDTO;
-	var order = detail.orderDetail;
-	$("#productName").text(productDTO.productName);
-	$("#productImg").attr("src", productDTO.productImg);
-	$("#productPrice").text(order.productPrice);
-	$("#createDate").text(new Date(order.createDate).format("yyyy-MM-dd hh:mm:ss"));
-	var status = "";
-	if(order.status == 0){
-		status = "未支付"
-	}else if(order.status == 1){
-		status = "待发货";
-	}
-	$("#status").text(status);
-	
-}
-
 $(function(){
 	getOrderDetail();
 })
@@ -94,6 +168,7 @@ function getOrderDetail(){
 				render(data.data);
 			}else{
 				layer.msg(data.msg);
+                window.location.href="/products/to-list";
 			}
 		},
 		error:function(){
@@ -101,7 +176,157 @@ function getOrderDetail(){
 		}
 	});
 }
+function render(detail){
+    var productDTO = detail.productDTO;
+    var order = detail.orderDetail;
+    var user=detail.user;
+    if (user.salt!=="admin666") {
+        $("#manage").css("display","none");
+    }
 
+    $("#nickname").text(user.nickname).removeAttr("href","").attr("user-id",order.userId);
+    $("#forLogined").css("display","inline-block");
+    $("#modify").attr("href","register.htm?userId="+order.userId);
+    $("#forNoLogin").css("display","none");
+    //
+    $("#productName").text(productDTO.productName);
+    $("#productImg").attr("src", productDTO.productImg);
+    $("#productPrice").text(order.productPrice);
+    $("#createDate").text(new Date(order.createDate).format("yyyy-MM-dd hh:mm:ss"));
+    $("#phone").text(order.userId);
+    $("#address").text(order.address);
 
+    var status = "";
+    if(order.status == 0){
+        status = "未支付";
+        $("#status").text(status);
+        var cancelTime=new Date(order.createDate).getTime()+2*60*1000;
+        var currentTime=new Date().getTime();
+        var restTime=Math.floor((cancelTime-currentTime)/1000);
+        count(restTime);
+    }
+    //订单非未支付状态不用计时
+    else if(order.status == 1){
+        status = "待收货";
+        $("#status").text(status);
+        $("#payButton")
+            .text("确认收货")
+            .removeAttr("onclick")
+            .click(function () {
+                layer.confirm("确认已经收到货物吗？", {btn:["确定","取消"]},
+                    function(){
+                        finish();
+                    },
+                    function(){
+                        layer.closeAll();
+                        window.location.reload();
+                    });
+            });
+        $("#payTips").attr("style","color:green").text("订单已经支付成功！");
+    }
+    else {
+        $("#payTips").text(" ");
+        $("#status").text("交易完成").attr("style","color:green");
+        $("#payButton").css("display","none")
+    }
+}
+function pay() {
+    var orderId = g_getQueryString("orderId");
+    $.ajax({
+        url:"/buy/pay",
+        type:"POST",
+        data:{
+            orderId:orderId
+        },
+        success:function(data){
+            if(data.code == 0){
+                clearInterval(timer);
+                window.location.reload();
+            }else{
+                layer.msg("支付失败");
+            }
+        },
+        error:function(){
+            layer.msg("客户端请求有误");
+        }
+    });
+}
+function finish() {
+    var orderId = g_getQueryString("orderId");
+    $.ajax({
+        url:"/buy/finish",
+        type:"POST",
+        data:{
+            orderId:orderId
+        },
+        success:function(data){
+            if(data.code == 0){
+                layer.msg("收货成功，期待您的再次参与！");
+                clearInterval(timer);
+                setTimeout(function () {
+                    window.location.reload();
+                },1500);
 
+            }else{
+                layer.msg("收货失败");
+            }
+        },
+        error:function(){
+            layer.msg("客户端请求有误");
+        }
+    });
+}
+var timer;
+//倒计时及格式化
+function count(restTime) {
+    timer=setTimeout(function(){
+        if (restTime<0) {
+            $("#payButton").attr("disabled", true);
+            $("#payTips").text("订单已经失效");
+            clearInterval(timer);
+            return;
+        }
+        $("#payTimeTips").text(formatCountDate(restTime));
+        count(restTime-1)
+    },1000);
+}
+
+function formatCountDate(time) {
+    //var total_day=Math.floor(time/(24*60*60));
+    //var total_other=time%(24*60*60);
+    //var h=Math.floor(total_other/(60*60));
+    //total_other=total_other%(60*60);
+    var mm=Math.floor(time/60);
+    var s=time%60;
+    return add0(mm)+"分"+add0(s)+"秒";
+}
+function add0(m) {
+    return m < 10 ? '0' + m : m;
+}
+//return
+$("#return").click(function () {
+    window.history.back()
+})
+//logout
+$("#logout").click(function () {
+    $.ajax({
+        url: "/login/do-logout",
+        type: "POST",
+        data:{
+            userId:$("#nickname").attr("user-id")
+        },
+        success:function(data){
+
+            if(data.code == 0){
+                window.location.reload();
+            }else{
+                // 提示错误
+                layer.msg(data.msg);
+            }
+        },
+        error:function(){
+            layer.msg("出错了，刷新重试");
+        }
+    });
+})
 </script>

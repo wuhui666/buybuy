@@ -10,6 +10,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import zbh.study.anotations.RequestLimit;
 import zbh.study.domain.User;
 import zbh.study.exception.GlobalException;
+import zbh.study.redis.RedisKeyPrefix;
 import zbh.study.result.CodeMsg;
 import zbh.study.result.Result;
 import zbh.study.service.UserService;
@@ -47,9 +48,7 @@ public class AccessInterceptor extends HandlerInterceptorAdapter {
            int seconds = accessLimit.seconds();
            int maxCount = accessLimit.maxCount();
            boolean loginRequired = accessLimit.loginRequired();
-
-
-           String key=request.getRequestURI();
+           String key= RedisKeyPrefix.USER_LIMIT+request.getRequestURI();
            if (loginRequired){
                if (user == null) {
                    createResponse(response, CodeMsg.SESSION_ERROR);

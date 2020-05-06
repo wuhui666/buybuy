@@ -2,14 +2,18 @@ package zbh.study.controller;
 
 import com.sun.org.apache.regexp.internal.RE;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
+import zbh.study.domain.Product;
 import zbh.study.domain.User;
 import zbh.study.dto.ProductDTO;
 import zbh.study.dto.ProductDetailDTO;
@@ -18,10 +22,16 @@ import zbh.study.result.CodeMsg;
 import zbh.study.result.Result;
 import zbh.study.service.ProductService;
 import zbh.study.service.UserService;
+import zbh.study.vo.ProductAddVO;
+import zbh.study.vo.PublishVO;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -66,48 +76,6 @@ public class ProductController {
         return html;
     }
 
-    // 供非静态化模板页面
-    @GetMapping("/detail2/{id}")
-    @ResponseBody
-    public String list(HttpServletRequest request,HttpServletResponse response,
-                       Model model, User user, @PathVariable long id){
-        // 尝试从缓存读取页面
-        String html = redisTemplate.opsForValue().get(RedisKeyPrefix.PAGE_PREFIX + "productDetail");
-        // 找到缓存直接返回HTML页面
-        if (!StringUtils.isBlank(html)){
-            return html;
-        }
-        // 否则手动渲染返回，需要查询数据库
-        ProductDTO productDTO = productService.getById(id);
-        model.addAttribute("product", productDTO);
-        long startAt = productDTO.getStartDate().getTime();
-        long endAt = productDTO.getEndDate().getTime();
-        long now = System.currentTimeMillis();
-        int seckillStatus = 0;
-        int remainSeconds = 0;
-        if(now < startAt ) {//秒杀还没开始，倒计时
-            seckillStatus = 0;
-            remainSeconds = (int)((startAt - now )/1000);
-        }else  if(now > endAt){//秒杀已经结束
-            seckillStatus = -1;
-            remainSeconds = -1;
-        }else {//秒杀进行中
-            seckillStatus = 1;
-            remainSeconds = 0;
-        }
-        model.addAttribute("user", user);
-        model.addAttribute("seckillStatus", seckillStatus);
-        model.addAttribute("remainSeconds", remainSeconds);
-        WebContext ctx = new WebContext(request,response,
-                request.getServletContext(),request.getLocale(), model.asMap());
-        //手动渲染
-        html = thymeleafViewResolver.getTemplateEngine().process("product_detail", ctx);
-        // 缓存该页面60s
-        if (!StringUtils.isBlank(html)){
-            redisTemplate.opsForValue().set(RedisKeyPrefix.PAGE_PREFIX+"productDetail", html,RedisKeyPrefix.EXPIRE_TIME_MINUTE, TimeUnit.SECONDS);
-        }
-        return html;
-    }
 
     // 供静态化html页面
     @RequestMapping(value="/detail/{productId}")
@@ -138,5 +106,82 @@ public class ProductController {
         detailDTO.setRemainSeconds(remainSeconds);
         detailDTO.setBuyStatus(buyStatus);
         return Result.success(detailDTO);
+    }
+    @RequestMapping(value="/detail/all")
+    public String manage( Model model, User user) {
+        if (user == null) {
+            return "login";
+        }
+        List<ProductDTO> productDTOList = productService.listProductsAll();
+        model.addAttribute("productDTOList", productDTOList);
+        model.addAttribute("user", user);
+        return "manage";
+    }
+    @GetMapping("/manage-list")
+    public String listForManage(User user,Model model){
+        if (user == null) {
+            return "login";
+        }
+        model.addAttribute("productList",productService.getRest());
+        model.addAttribute("user", user);
+        return "to_add";
+    }
+
+    @PostMapping("/add")
+    @ResponseBody
+    public Result<Long> add(User user, ProductAddVO vo,HttpServletRequest request) throws FileNotFoundException {
+
+        MultipartFile file=vo.getProductImg();
+        if (user == null || file==null) {
+            return Result.error(CodeMsg.SESSION_ERROR);
+        }
+
+        String filename = System.currentTimeMillis()+file.getOriginalFilename();
+        String path = ResourceUtils.getURL("classpath:").getPath()+"static/img";
+        String realPath = path.replace('/', '\\').substring(1,path.length());
+        File target=new File(realPath+"\\"+filename);
+
+        try {
+            file.transferTo(target);
+        } catch (IOException e) {
+            return Result.error(CodeMsg.SERVER_ERROR);
+        }
+        String dbPath="/img/"+filename;
+        Product p= new Product();
+        BeanUtils.copyProperties(vo, p);
+        p.setProductImg(dbPath);
+        productService.add(p);
+        return Result.success(p.getId());
+    }
+    @GetMapping("/to-publish")
+    public String toPublish(Model model,User user,
+                            @RequestParam(required = false,value = "update") Boolean update,
+                            @RequestParam("productId") long pid){
+
+        model.addAttribute("user", user);
+        if (update != null) {
+            //dto
+            model.addAttribute("product", productService.getById(pid));
+            model.addAttribute("isUpdate", true);
+        }
+        else {
+            Product product = productService.getProductById(pid);
+            model.addAttribute("product", product);
+            model.addAttribute("isUpdate", false);
+        }
+        return "publish";
+    }
+    @PostMapping("/publish")
+    @ResponseBody
+    public Result<Boolean> publish(User user, PublishVO vo,@RequestParam("isUpdate") Boolean update){
+        if (user == null) {
+            Result.error(CodeMsg.SESSION_ERROR);
+        }
+        //页面缓存清除
+        redisTemplate.delete(RedisKeyPrefix.PAGE_PREFIX+"productList");
+        if (update == null|| !update) {
+            return Result.success(productService.publish(vo)==1);
+        }
+        return Result.success(productService.updatePublish(vo)==1);
     }
 }

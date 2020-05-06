@@ -11,10 +11,13 @@ import zbh.study.dao.OrderDetailDAO;
 import zbh.study.domain.BuyOrder;
 import zbh.study.domain.OrderDetail;
 import zbh.study.domain.User;
+import zbh.study.dto.OrderDetailDTO;
+import zbh.study.dto.OrderListDTO;
 import zbh.study.dto.ProductDTO;
 import zbh.study.redis.RedisKeyPrefix;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class BuyOrderService {
@@ -41,7 +44,7 @@ public class BuyOrderService {
         OrderDetail order=new OrderDetail();
         order.setUserId(user.getId());
         order.setProductId(product.getId());
-        order.setAddress("武汉市洪山区湖北工业大学");
+        order.setAddress(user.getAddress());
         order.setProductCount(1);
         order.setCreateDate(new Date());
         order.setProductName(product.getProductName());
@@ -60,5 +63,27 @@ public class BuyOrderService {
         redisTemplate.opsForValue().set(RedisKeyPrefix.BUY_ORDER_DETAIL+user.getId()+"_"+product.getId(), JSON.toJSONString(order));
 
         return order;
+    }
+
+    public OrderDetail getOrderById(long orderId) {
+        return orderDetailDAO.getOrderById(orderId);
+    }
+    public void deleteOrdersForReset() {
+        orderDetailDAO.deleteOrdersForReset();
+        buyOrderDAO.deletebuyOrdersForReset();
+    }
+    public int updateStatus(long orderId,int status){
+        if (status==1){
+            orderDetailDAO.updatePayDate(orderId,new Date());
+        }
+        return orderDetailDAO.updateStatus(orderId, status);
+    }
+    public void deleteOrderById(long id) {
+        orderDetailDAO.deleteOrdersById(id);
+        buyOrderDAO.deletebuyOrdersById(id);
+    }
+
+    public List<OrderListDTO> getOrdersByUid(Long id) {
+       return orderDetailDAO.getOrdersByUid(id);
     }
 }

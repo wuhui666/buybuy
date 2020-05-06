@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新品添加</title>
+    <!-- jquery -->
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" href="/bootstrap/css/bootstrap.min.css" />
+    <script type="text/javascript" src="/bootstrap/js/bootstrap.min.js"></script>
+    <!-- jquery-validator 校验 -->
+    <script type="text/javascript" src="/jquery-validation/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="/jquery-validation/localization/messages_zh.min.js"></script>
+    <!-- layer 弹窗 -->
+    <script type="text/javascript" src="/layer/layer.js"></script>
+    <!-- md5.js -->
+    <script type="text/javascript" src="/js/md5.min.js"></script>
+    <!-- common.js 自定义公用js-->
+    <script type="text/javascript" src="/js/common.js"></script>
+    
+    <style>
+        html{
+            padding-top: 5%;
+        }
+        html,body{
+            height:100%;
+            width:100%;
+        }
+        body{
+            background:url('/img/login.jpg') no-repeat;
+            background-size:100% 100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<div class="row" style="margin-top: 0px">
+    <div class="col-md-5 col-md-5" style="margin-left: 36%;margin-right: 32%">
+        <form id="myform">
+            <table style="border-collapse:separate;border-spacing: 25px;border: solid 2px gainsboro">
+                <tr>
+                    <td colspan="2" style="margin-bottom: 10px;text-align: center;">
+                        <h3 id="tip" style="font-weight: bold;font-family: Arial">商品上新！</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label>图&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;片：</label></td>
+                    <td style="width: 210px">
+                        <input name="productImg" type="file" style="display: none">
+                        <img style="width:50px;height:50px;display: none" class="img-rounded" id="productImg" src=""/>
+                        <img id="uploadTrigger" class="img-thumbnail" src="/img/plus.png" style="width:30% ">
+                        <span id="productImgSpan"></span>
+                    </td>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label>名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：</label></td>
+                    <td>
+
+                        <input id="productName"  name="productName"  type="text" class="form-control">
+                        <span id="productNameSpan"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label>标&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;题:</label></td>
+                    <td>
+                        <input id="productTitle" name="productTitle" type="text" class="form-control" >
+                        <span id="productTitleSpan"></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><label>价&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;格：</label></td>
+                    <td>
+                        <input id="productPrice" name="productPrice" class="form-control" >
+                        <span id="productPriceSpan"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label>描&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;述：</label></td>
+                    <td>
+                    <textarea id="productDetail" name="productDetail"  class="form-control" >
+                    </textarea><span id="productDetailSpan"></span>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: center">
+                        <button onclick="upLoad()" id="submit-button" type="button" class="btn btn-info" style="width:280px;">确认</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+
+    </div>
+</div>
+</body>
+<script>
+
+    $(function () {
+        $("#uploadTrigger").click(function () {
+            $("input[type='file']").trigger("click");
+        });
+        //预览
+        $("input[type='file']").change(function () {
+            var fileReader = new FileReader();
+            fileReader.readAsDataURL($(this)[0].files[0]);
+            fileReader.onload = function () {
+                $("#productImg").attr("src", this.result);//结果会存在result属性
+                $("#productImg").css("display", "inline")
+            };
+        })
+    })
+    //一定要trim()
+    function check() {
+        var priceReg = /^[1-9]+\d*(\.\d{0,2})?$|^0?\.\d{0,2}$/;
+        //文件对象
+        var file=$("input[name='productImg']")[0].files[0];
+        if (file===undefined) {
+            $("form span").text("");
+            $("#productImgSpan").text("请选择图片").css("color","red");
+            return false;
+        }
+        //文件名
+        var file_name=file.name;
+        //扩展名
+        var ext=file_name.substring(file_name.lastIndexOf(".")+1);
+        if (ext!=="png"&&ext!=="jpg") {
+            $("form span").text("");
+            $("#productImgSpan").text("仅png,jpg文件").css("color","red");
+            return false;
+        }
+
+        if ($("input[name='productName']").val().trim() === "") {
+            $("form span").text("");
+            $("#productNameSpan").text("商品名不能为空").css("color","red");
+            return false;
+        }
+        if ($("input[name='productTitle']").val().trim() === "") {
+            $("form span").text("");
+            $("#productTitleSpan").text("标题不能为空").css("color","red");
+            return false;
+        }
+        if (!priceReg.test($("input[name='productPrice']").val())||$("input[name='productPrice']").val().trim() === "") {
+            $("form span").text("");
+            $("#productPriceSpan").text("请输入正确格式数字作为价格").css("color","red");
+            return false;
+        }
+        if ($("#productDetail").val().trim() === "") {
+            $("form span").text("");
+            $("#productDetailSpan").text("描述不能为空").css("color","red");
+            return false;
+        }
+
+        return true;
+    }
+    function upLoad() {
+        if (!check())
+            return;
+        g_showLoading();
+        $.ajax({
+            url: "/products/add",
+            type: "POST",
+            data: new FormData($("#myform")[0]),
+            processData: false,//不需要ajax处理data
+            contentType: false,//关闭类型
+            success: function (data) {
+                // 关闭loading
+                layer.closeAll();
+                if (data.code == 0) {
+                    layer.msg("添加成功,继续填写该商品活动详情");
+                    setTimeout(function () {
+                        window.location.href = "/products/to-publish?productId="+data.data;
+                    },1500)
+
+                } else {
+                    // 提示错误
+                    layer.msg(data.msg);
+                }
+            },
+            error: function () {
+                layer.closeAll();
+            }
+        });
+    }
+
+
+</script>
+</html>

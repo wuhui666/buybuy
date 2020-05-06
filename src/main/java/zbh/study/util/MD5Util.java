@@ -13,7 +13,7 @@ public class MD5Util {
     // 第一次md，固定salt,前端将输入密码加密后生成表单数据，提交给后端
     public static String inputPassToFormPass(String inputPass) {
         String str = ""+salt.charAt(0)+salt.charAt(2) + inputPass +salt.charAt(5) + salt.charAt(4);
-        System.out.println(str);
+
         return md5(str);
     }
     // 第二次md,随机salt
