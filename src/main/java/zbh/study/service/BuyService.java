@@ -95,23 +95,6 @@ public class BuyService {
         orderService.deleteOrdersForReset();
     }
 
-
-    /** 检查接口路径的拼接部分
-     * @param user
-     * @param productId
-     * @param path
-     * @return
-     */
-    public boolean checkPath(User user, long productId, String path) {
-        if(user == null || path == null) {
-            return false;
-        }
-        String pathOld = template.opsForValue().get(RedisKeyPrefix.BUY_PATH_STRING+user.getId() + "_"+ productId);
-        return path.equals(pathOld);
-    }
-
-
-
     public String createBuyPath(User user, long productId) {
         if(user == null || productId <=0) {
             return null;
