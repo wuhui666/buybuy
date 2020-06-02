@@ -88,11 +88,11 @@ public class ProductController {
         long startAt = productDTO.getStartDate().getTime();
         long endAt = productDTO.getEndDate().getTime();
         long now = System.currentTimeMillis();
-        int buyStatus = 0;
-        int remainSeconds = 0;
+        int buyStatus;
+        int remainSeconds;
         if(now < startAt ) {//秒杀还没开始，倒计时
             buyStatus = 0;
-            remainSeconds = (int)((startAt - now )/1000);//大于等于0
+            remainSeconds = (int)((startAt - now )/1000);//大于等于0，多久开始
         }else  if(now > endAt){//秒杀已经结束
             buyStatus = 2;
             remainSeconds=0;
@@ -180,6 +180,8 @@ public class ProductController {
         //页面缓存清除
         redisTemplate.delete(RedisKeyPrefix.PAGE_PREFIX+"productList");
         if (update == null|| !update) {
+            //新增库存信息同步到缓存
+            redisTemplate.opsForValue().set(RedisKeyPrefix.PRODUCT_STOCK+vo.getProductId(),String.valueOf(vo.getBuyStock()));
             return Result.success(productService.publish(vo)==1);
         }
         return Result.success(productService.updatePublish(vo)==1);

@@ -69,9 +69,9 @@ public class BuyController implements InitializingBean {
         if (StringUtils.isBlank(s)){
             return Result.error(CodeMsg.BUY_DENIED);
         }
-        //判断是否已经秒杀到了
+        //通过redis判断是否已经秒杀到了
         OrderDetail orderDetail = buyOrderService.getByUserAndProduct(user.getId(), productId);
-        // TODO:  注释掉允许重复购买
+        // TODO:  测试时注释掉允许重复购买
         /*if(orderDetail != null) {
             return Result.error(CodeMsg.BUY_REPEAT);
         }*/

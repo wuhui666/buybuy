@@ -47,10 +47,12 @@ public class LoginController {
     @RequestMapping("/register")
     @ResponseBody
     public Result<Boolean> register(@RequestParam(required = false,name = "update") String flag,
-                                    String id, String nickname, String password, String address)
+                                    String id, String nickname, String password,
+                                    String address,HttpServletRequest request,HttpServletResponse response)
     {
         User user=new User();
-        user.setId(Long.valueOf(id));
+        long uid=Long.valueOf(id);
+        user.setId(uid);
         user.setNickname(nickname);
         user.setPassword(password);
         user.setAddress(address);
@@ -58,7 +60,9 @@ public class LoginController {
             return Result.success(userService.register(user));
         }
         else {
-            return Result.success(userService.update(user)==1);
+            int update = userService.update(user);
+            Boolean logout = userService.logout(request, response, uid);
+            return Result.success(update==1&&logout);
         }
 
 

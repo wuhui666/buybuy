@@ -44,6 +44,7 @@ public class MqReceiver {
             BuyMessage mm  = JSON.parseObject(message).toJavaObject(BuyMessage.class);
             User user = mm.getUser();
             long productId = mm.getProductId();
+            //数据库库存查询
             ProductDTO dto = productService.getById(productId);
             int stock = dto.getBuyStock();
             if(stock <= 0) {

@@ -51,4 +51,4 @@ server:
     #最大连接数默认10000
     max-connections: 15000
   #连接超时
-  #connection-timeout: 5
+  connection-timeout: 20000
